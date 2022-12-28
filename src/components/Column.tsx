@@ -1,10 +1,9 @@
-import React from 'react';
 import { AddIcon } from '@chakra-ui/icons';
 import { Badge, Box, Heading, IconButton, Stack, useColorModeValue } from '@chakra-ui/react';
-import { ColumnType } from '../utils/enums';
-import { TaskModel } from '../utils/models';
-import Task from './Task';
+import useColumnDrop from '../hooks/useColumnDrop';
 import useColumnTasks from '../hooks/useColumnTask';
+import { ColumnType } from '../utils/enums';
+import Task from './Task';
 
 const ColumnColorScheme: Record<ColumnType, string> = {
   Todo: 'gray',
@@ -13,10 +12,23 @@ const ColumnColorScheme: Record<ColumnType, string> = {
   Completed: 'green',
 };
 
+function Column({ column }: { column: ColumnType }) {
+  const { tasks, addEmptyTask, deleteTask, dropTaskFrom, swapTasks, updateTask } =
+    useColumnTasks(column);
 
+  const { dropRef, isOver } = useColumnDrop(column, dropTaskFrom);
 
-const Column = ({ column }: { column: ColumnType }) => {
-    const {tasks, addEmptyTask, updateTask, deleteTask} = useColumnTasks(column)
+  const ColumnTasks = tasks.map((task, index) => (
+    <Task
+      key={task.id}
+      task={task}
+      index={index}
+      onDropHover={swapTasks}
+      onUpdate={updateTask}
+      onDelete={deleteTask}
+    />
+  ));
+
   return (
     <Box>
       <Heading fontSize="md" mb={4} letterSpacing="wide">
@@ -32,12 +44,13 @@ const Column = ({ column }: { column: ColumnType }) => {
         _hover={{ bgColor: useColorModeValue('gray.200', 'gray.600') }}
         py={2}
         variant="solid"
+        onClick={addEmptyTask}
         colorScheme="black"
         aria-label="add-task"
         icon={<AddIcon />}
-        onClick={addEmptyTask}
       />
       <Stack
+        ref={dropRef}
         direction={{ base: 'row', md: 'column' }}
         h={{ base: 300, md: 600 }}
         p={4}
@@ -46,13 +59,12 @@ const Column = ({ column }: { column: ColumnType }) => {
         bgColor={useColorModeValue('gray.50', 'gray.900')}
         rounded="lg"
         boxShadow="md"
-        overflow="auto">
-        {tasks.map((task, index) => {
-          return <Task key={task.id} task={task} index={index} onDelete={deleteTask} onUpdate={updateTask} />;
-        })}
+        overflow="auto"
+        opacity={isOver ? 0.85 : 1}>
+        {ColumnTasks}
       </Stack>
     </Box>
   );
-};
+}
 
 export default Column;

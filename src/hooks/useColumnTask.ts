@@ -80,7 +80,7 @@ function useColumnTasks(column: ColumnType) {
           return allTasks;
         }
 
-        // remove the task from the original column and copy it within the destination column
+        // Удалить задачу из исходного столбца и скопировать ее в другой столбец
         return {
           ...allTasks,
           [from]: fromColumnTasks.filter((task) => task.id !== id),
