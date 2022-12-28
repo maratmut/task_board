@@ -4,6 +4,7 @@ import { Badge, Box, Heading, IconButton, Stack, useColorModeValue } from '@chak
 import { ColumnType } from '../utils/enums';
 import { TaskModel } from '../utils/models';
 import Task from './Task';
+import useColumnTasks from '../hooks/useColumnTask';
 
 const ColumnColorScheme: Record<ColumnType, string> = {
   Todo: 'gray',
@@ -12,28 +13,10 @@ const ColumnColorScheme: Record<ColumnType, string> = {
   Completed: 'green',
 };
 
-const mockTasks: TaskModel[] = [
-  {
-    id: '1',
-    title: 'Task 1',
-    column: ColumnType.TO_DO,
-    color: 'red.300',
-  },
-  {
-    id: '2',
-    title: 'Task 2',
-    column: ColumnType.TO_DO,
-    color: 'blue.300',
-  },
-  {
-    id: '3',
-    title: 'Task 4',
-    column: ColumnType.TO_DO,
-    color: 'green.300',
-  },
-];
+
 
 const Column = ({ column }: { column: ColumnType }) => {
+    const {tasks, addEmptyTask, updateTask, deleteTask} = useColumnTasks(column)
   return (
     <Box>
       <Heading fontSize="md" mb={4} letterSpacing="wide">
@@ -52,6 +35,7 @@ const Column = ({ column }: { column: ColumnType }) => {
         colorScheme="black"
         aria-label="add-task"
         icon={<AddIcon />}
+        onClick={addEmptyTask}
       />
       <Stack
         direction={{ base: 'row', md: 'column' }}
@@ -63,8 +47,8 @@ const Column = ({ column }: { column: ColumnType }) => {
         rounded="lg"
         boxShadow="md"
         overflow="auto">
-        {mockTasks.map((task, index) => {
-          return <Task key={task.id} task={task} index={index} />;
+        {tasks.map((task, index) => {
+          return <Task key={task.id} task={task} index={index} onDelete={deleteTask} onUpdate={updateTask} />;
         })}
       </Stack>
     </Box>

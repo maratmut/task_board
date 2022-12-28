@@ -1,13 +1,25 @@
 import { DeleteIcon } from '@chakra-ui/icons';
 import { Box, IconButton, Textarea } from '@chakra-ui/react';
 import { TaskModel } from '../utils/models';
+import { AutoResizeTextarea } from './AutoResizeTextArea';
 
 type TaskProps = {
   index: number;
   task: TaskModel;
+  onUpdate: (id: TaskModel['id'], updatedTask: TaskModel ) => void
+  onDelete: (id: TaskModel['id']) => void
 };
 
-const Task = ({ index, task }: TaskProps) => {
+const Task = ({ index, task, onUpdate: handleUpdate, onDelete: handleDelete }: TaskProps) => {
+  const handleTitleChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const newTitle = e.target.value
+    handleUpdate(task.id, {...task, title: newTitle})
+  }
+
+  const handleDeleteClick = () => {
+    handleDelete(task.id)
+  }
+  
   return (
     <Box
       as="div"
@@ -35,8 +47,8 @@ const Task = ({ index, task }: TaskProps) => {
         opacity={0}
         _groupHover={{
           opacity: 1,
-        }} />
-        <Textarea
+        }} onClick={handleDeleteClick} />
+        <AutoResizeTextarea
           value={task.title}
           fontWeight="semibold"
           cursor="inherit"
@@ -47,6 +59,7 @@ const Task = ({ index, task }: TaskProps) => {
           maxH={200}
           focusBorderColor="none"
           color="gray.700"
+          onChange={handleTitleChange}
         />
       
     </Box>
